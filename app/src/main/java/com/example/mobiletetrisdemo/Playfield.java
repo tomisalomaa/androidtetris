@@ -17,6 +17,7 @@ public class Playfield extends Thread {
     private GameScreen.PlayfieldView playfieldView;
     public static Canvas canvas;
 
+
     public Playfield (SurfaceHolder holder, GameScreen.PlayfieldView playfieldView) {
         super();
         this.holder = holder;
@@ -53,7 +54,7 @@ public class Playfield extends Thread {
             }
 
             timeMillis = (System.nanoTime() - startTime) / 1000000;
-            waitTime = targetTime - timeMillis;
+            waitTime = targetTime - timeMillis - (playfieldView.getScore()*1000);
 
             try {
                 this.sleep(waitTime);

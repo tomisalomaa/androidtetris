@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -33,7 +34,6 @@ public class GameScreen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Fullscreen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // No title (requires 'android:theme="@android:style/Theme.DeviceDefault"' in manifest file)
@@ -56,9 +56,11 @@ public class GameScreen extends Activity {
 
         private Playfield playfield;
         private Bitmap block;
+        MediaPlayer mediaPlayer;
         private int[][] playfieldMatrix = new int[20][10];
         private Tetriminos[] tetriminos = new Tetriminos[7];
         private Tetriminos currentTetrimino;
+        private int points = 0;
         private int blockSize = 30;
         private int playfieldWidth = 10;
         private int playfieldHeight = 20;
@@ -119,6 +121,9 @@ public class GameScreen extends Activity {
             }, this, 7);
 
             createTetrimino();
+
+            mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris1);
+            mediaPlayer.start();
         }
 
         public void update() {
@@ -132,6 +137,7 @@ public class GameScreen extends Activity {
                 }
             }
             invalidate();
+            playSound(points);
         }
 
         public void createTetrimino() {
@@ -152,6 +158,26 @@ public class GameScreen extends Activity {
                 for (int i = checkRow; i > 0; i--) {
                     playfieldMatrix[i] = playfieldMatrix[i-1].clone();
                 }
+                points++;
+            }
+        }
+
+        // Responsible for setting the music according to "level"
+        public void playSound(int points) {
+
+            if (!mediaPlayer.isPlaying()) {
+                if (points < 5) {
+                    mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris1);
+                } else if (points >= 5 && points < 10) {
+                    mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris1half);
+                } else if (points >= 10 && points < 15) {
+                    mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris2);
+                } else if (points >= 15 && points < 20) {
+                    mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris3);
+                } else if (points >= 20) {
+                    mediaPlayer = MediaPlayer.create(getContext(), R.raw.tetris4);
+                }
+                mediaPlayer.start();
             }
         }
 
@@ -168,13 +194,15 @@ public class GameScreen extends Activity {
         }
 
         public int getPlayfieldWidth() {
-
             return playfieldWidth;
         }
 
         public int getPlayfieldHeight() {
-
             return playfieldHeight;
+        }
+
+        public int getScore() {
+            return points;
         }
 
         @Override
@@ -236,6 +264,11 @@ public class GameScreen extends Activity {
                             ((float) 0.5 * screenWidthDivided) + (i * ((screenWidth() - 2 * screenWidthDivided) / 10)),
                             paint);
                 }
+
+                // Draws the current score to the bottom of the screen in yellow.
+                paint.setColor(Color.YELLOW);
+                paint.setTextSize(screenWidthDivided);
+                canvas.drawText("SCORE: " + points, screenWidthDivided, screenHeight()-screenWidthDivided, paint);
             }
         }
 
