@@ -272,6 +272,13 @@ public class GameScreen extends Activity {
             }
         }
 
+        /*
+        * The onTouchEvent measures the length of the swipe.
+        * Rightwise swipe moves the block to the right.
+        * Leftwise swipe moves the block to the left.
+        * Upward swipe rotates the block.
+        * Downward swipe drops the block.
+        */
         @Override
         public boolean onTouchEvent(MotionEvent event) {
 
@@ -286,9 +293,6 @@ public class GameScreen extends Activity {
                 case MotionEvent.ACTION_UP:
                     touchPosX = event.getX();
                     touchPosY = event.getY();
-
-                    System.out.println("TouchPosX: " + touchPosX + ", " + "TouchPosY: " + touchPosY);
-                    System.out.println("startX: " + startX + ", " + "startY: " + startY);
 
                     if (touchPosY > startY - 200 && touchPosY < startY + 200) {
                         if (touchPosX > startX + screenWidthDivided) {
